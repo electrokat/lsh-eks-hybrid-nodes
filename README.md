@@ -2,6 +2,8 @@
 
 End-to-end deployment guide for running Amazon EKS hybrid nodes on Latitude.sh bare metal infrastructure with private connectivity through Megaport Direct Connect.
 
+If there are areas that didn't work for you and you have an alternative, log a Pull Request.
+
 ## Architecture Overview
 
 The deployment consists of three independent layers that need to be set up in order:
@@ -16,6 +18,7 @@ The control plane runs in AWS, the worker node runs on Latitude bare metal, and 
 
 The following are required before starting:
 
+- CIDR addressing mapped out before commencement
 - AWS account with admin permissions
 - Megaport account with at least one provisioned MCR
 - Latitude.sh account with a bare metal server provisioned
@@ -25,7 +28,7 @@ The following are required before starting:
 
 The EKS RemoteNodeNetwork CIDR, the MCR A-End interface IP, and the node IP must all be in the same /24 subnet. This ensures layer 2 ARP works correctly between the MCR and the node. Mismatched subnets cause silent failures in kubectl exec, kubectl logs, and pod-to-control-plane communication.
 
-The working design is:
+An example of a working IP addressing scheme is:
 
 ```
 MCR A-End interface IP:   10.10.0.1/24
@@ -326,7 +329,7 @@ The Megaport side is configured through the portal as their Terraform provider h
 4. Configure as follows:
    - Service: Hosted VIF (not hosted connection, to avoid Direct Connect port charges)
    - AWS Account ID: Your AWS account ID
-   - AWS Region: us-east-1
+   - AWS Region: us-east-1 (or any region that's closest to the Latitude metro)
    - VIF Type: Private
    - BGP Customer ASN: 4200000001 (or your chosen customer ASN)
    - VLAN: Auto-assign or specify
